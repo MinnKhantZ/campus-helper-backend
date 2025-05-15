@@ -4,12 +4,14 @@ import cors from "cors";
 import helmet from "helmet";
 import corsOptions from "./src/config/corsOptions.js";
 import sequelize, { PORT } from "./src/config/db.config.js";
-// import "./src/models/User.js";
-// import "./src/models/Event.js";
-// import "./src/models/Timetable.js";
-// import "./src/models/Club.js";
-// import clientRouter from "./src/routes/clientRouter.js";
-// import errorHandler from "./src/middleware/errorHandler.js";
+import "./src/models/User.js";
+import "./src/models/Event.js";
+import "./src/models/Timetable.js";
+import "./src/models/Club.js";
+// import userRoutes from "./src/routes/User.js";
+import eventRoutes from "./src/routes/Event.js";
+import timetableRoutes from "./src/routes/Timetable.js";
+import clubRoutes from "./src/routes/Club.js";
 
 const app = express();
 
@@ -25,10 +27,10 @@ app.use(
   }),
 );
 
-// client
-// app.use("/api/client/", clientRouter);
-
-// app.use(errorHandler);
+// app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/timetables", timetableRoutes);
+app.use("/api/clubs", clubRoutes);
 
 // Sync models with the database
 
