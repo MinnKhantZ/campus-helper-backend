@@ -39,13 +39,19 @@ const DB =
   NODE_ENV === "production" ? dbConfig.production : dbConfig.development;
 
 const sequelize = new Sequelize({
-  dialect: "mysql",
+  dialect: "postgres",
   host: DB.host,
   username: DB.username,
   password: DB.password,
   database: DB.database,
   port: DB.port,
   logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 export default sequelize;
