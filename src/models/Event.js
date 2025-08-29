@@ -7,7 +7,8 @@ const Event = sequelize.define('Event', {
   title: DataTypes.STRING,
   description: DataTypes.TEXT,
   date: DataTypes.DATE,
-  place: DataTypes.STRING
+  place: DataTypes.STRING,
+  user_id: { type: DataTypes.INTEGER, allowNull: true },
 });
 
 // Event.belongsTo(User, { foreignKey: 'user_id' });

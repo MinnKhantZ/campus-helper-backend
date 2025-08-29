@@ -46,12 +46,12 @@ const sequelize = new Sequelize({
   database: DB.database,
   port: DB.port,
   logging: false,
-  dialectOptions: {
+  dialectOptions: NODE_ENV === 'production' ? {
     ssl: {
       require: true,
       rejectUnauthorized: false,
     },
-  },
+  } : {},
 });
 
 export default sequelize;

@@ -3,12 +3,12 @@ import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
 import corsOptions from "./src/config/corsOptions.js";
-import sequelize, { PORT } from "./src/config/db.config.js";
+import sequelize, { PORT, NODE_ENV } from "./src/config/db.config.js";
 import "./src/models/User.js";
 import "./src/models/Event.js";
 import "./src/models/Timetable.js";
 import "./src/models/Club.js";
-// import userRoutes from "./src/routes/User.js";
+import authRoutes from "./src/routes/Auth.js";
 import eventRoutes from "./src/routes/Event.js";
 import timetableRoutes from "./src/routes/Timetable.js";
 import clubRoutes from "./src/routes/Club.js";
@@ -28,7 +28,9 @@ app.use(
 );
 
 // app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
+app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use("/api/timetables", timetableRoutes);
 app.use("/api/clubs", clubRoutes);
 
@@ -38,9 +40,11 @@ sequelize
   .authenticate()
   .then(async () => {
     try {
-      // await sequelize.sync({ force: false, alter: true }).then(() => {
-      //   console.log("✅ Database synced");
-      // });
+      if (NODE_ENV !== 'production') {
+        await sequelize.sync({ alter: true }).then(() => {
+          console.log("✅ Database synced (development)");
+        });
+      }
       // Start the server
       app.listen(PORT, () => {
         console.log(`🎉 Server is running on port ${PORT}`);

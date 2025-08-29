@@ -12,6 +12,7 @@ const corsOptions = {
     }
   },
   credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["X-Total-Count"],
 };
 
