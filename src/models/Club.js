@@ -7,7 +7,9 @@ const Club = sequelize.define('Club', {
   name: DataTypes.STRING,
   description: DataTypes.TEXT,
   admin_id: DataTypes.INTEGER,
-  student_ids: DataTypes.JSON // Manual lookup using user IDs
+  // Use JSONB to make containment queries easier on Postgres
+  student_ids: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] }, // accepted members (user IDs)
+  pending_ids: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] }, // pending join requests (user IDs)
 });
 
 Club.belongsTo(User, { foreignKey: 'admin_id', as: 'admin' }); // Club.admin_id → User.id

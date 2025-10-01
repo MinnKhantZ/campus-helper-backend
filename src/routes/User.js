@@ -1,9 +1,9 @@
 import express from "express";
-import { createUser, getUsers } from "../controllers/User.js";
+import { usersByIds } from "../controllers/User.js";
+import { authMiddleware } from "../services/auth.js";
 
 const router = express.Router();
 
-router.post("/", createUser);
-router.get("/", getUsers);
+router.get("/lookup", authMiddleware(), usersByIds);
 
 export default router;

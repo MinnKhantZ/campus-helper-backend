@@ -87,3 +87,16 @@ export const me = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const usersByIds = async (req, res) => {
+  try {
+    const idsParam = String(req.query.ids || '').trim();
+    if (!idsParam) return res.status(400).json({ message: 'ids query is required' });
+    const ids = idsParam.split(',').map((s) => Number(s)).filter((n) => Number.isFinite(n));
+    if (!ids.length) return res.status(400).json({ message: 'No valid ids' });
+    const users = await User.findAll({ where: { id: ids } });
+    res.status(200).json(users.map((u) => ({ id: u.id, name: u.name, phone: u.phone, role: u.role })));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
