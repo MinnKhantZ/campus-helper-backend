@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import MarketplaceItem from '../models/MarketplaceItem.js';
+import User from '../models/User.js';
 
 // Create Item
 export const createItem = async (req, res) => {
@@ -56,13 +57,15 @@ export const getItems = async (req, res) => {
 
     const [sortField, sortDir] = String(sort).split(':');
 
-    const items = await MarketplaceItem.findAll({
+    const { count, rows } = await MarketplaceItem.findAndCountAll({
       where,
       order: [[sortField || 'createdAt', (sortDir || 'DESC').toUpperCase()]],
       limit: Number(limit),
       offset: (Number(page) - 1) * Number(limit),
+      include: [{ model: User, as: 'seller', attributes: ['id', 'name', 'phone'] }],
     });
-    res.json(items);
+    res.setHeader('X-Total-Count', String(count));
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -70,7 +73,9 @@ export const getItems = async (req, res) => {
 
 export const getItemById = async (req, res) => {
   try {
-    const item = await MarketplaceItem.findByPk(req.params.id);
+    const item = await MarketplaceItem.findByPk(req.params.id, {
+      include: [{ model: User, as: 'seller', attributes: ['id', 'name', 'phone'] }],
+    });
     if (!item) return res.status(404).json({ message: 'Item not found' });
     res.json(item);
   } catch (err) {

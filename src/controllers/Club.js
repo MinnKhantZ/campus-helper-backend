@@ -1,5 +1,6 @@
 import Club from "../models/Club.js";
 import Announcement from "../models/Announcement.js";
+import Message from "../models/Message.js";
 
 export const createClub = async (req, res) => {
   const { name, description } = req.body;
@@ -45,6 +46,7 @@ export const deleteClub = async (req, res) => {
     const isAdmin = user.role === 'admin';
     if (!isOwner && !isAdmin) return res.status(403).json({ message: 'Only owner or admin can delete' });
     await Announcement.destroy({ where: { club_id: id } });
+    await Message.destroy({ where: { club_id: id } });
     await club.destroy();
     res.status(200).json({ message: 'Club deleted' });
   } catch (err) {
@@ -142,6 +144,43 @@ export const getAnnouncements = async (req, res) => {
     const { id } = req.params; // club id
   const anns = await Announcement.findAll({ where: { club_id: id }, order: [['id', 'DESC']], include: [{ association: 'author' }] });
     res.status(200).json(anns);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const rejectJoin = async (req, res) => {
+  try {
+    const approverId = req.user?.id;
+    const { id } = req.params;
+    const { userId } = req.body;
+    const club = await Club.findByPk(id);
+    if (!club) return res.status(404).json({ message: 'Club not found' });
+    if (club.admin_id !== approverId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only owner or admin can reject' });
+    }
+    if (!club.pending_ids.includes(userId)) return res.status(400).json({ message: 'User not in pending list' });
+    club.pending_ids = club.pending_ids.filter((pid) => pid !== userId);
+    await club.save();
+    res.status(200).json({ message: 'Join request rejected', club });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const leaveClub = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const club = await Club.findByPk(id);
+    if (!club) return res.status(404).json({ message: 'Club not found' });
+    if (club.admin_id === userId) {
+      return res.status(400).json({ message: 'Club owner cannot leave. Delete the club instead.' });
+    }
+    if (!club.student_ids.includes(userId)) return res.status(400).json({ message: 'Not a member' });
+    club.student_ids = club.student_ids.filter((sid) => sid !== userId);
+    await club.save();
+    res.status(200).json({ message: 'Left club', club });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

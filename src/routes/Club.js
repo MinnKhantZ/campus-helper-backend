@@ -1,6 +1,6 @@
 import express from "express";
 import { authMiddleware } from "../services/auth.js";
-import { createClub, getClubs, myClubs, requestJoin, approveJoin, getClubById, deleteClub, postAnnouncement, getAnnouncements, updateClub } from "../controllers/Club.js";
+import { createClub, getClubs, myClubs, requestJoin, approveJoin, rejectJoin, leaveClub, getClubById, deleteClub, postAnnouncement, getAnnouncements, updateClub } from "../controllers/Club.js";
 import { getClubMessages, sendClubMessage } from "../controllers/Message.js";
 
 const router = express.Router();
@@ -14,6 +14,8 @@ router.delete("/:id", authMiddleware(), deleteClub);
 
 router.post("/:id/join", authMiddleware(), requestJoin);
 router.post("/:id/approve", authMiddleware(), approveJoin);
+router.post("/:id/reject", authMiddleware(), rejectJoin);
+router.post("/:id/leave", authMiddleware(), leaveClub);
 
 router.get("/:id/announcements", authMiddleware(), getAnnouncements);
 router.post("/:id/announcements", authMiddleware(), postAnnouncement);

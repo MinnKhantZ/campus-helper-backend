@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.config.js';
+import User from './User.js';
 
 const MarketplaceItem = sequelize.define('MarketplaceItem', {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -13,5 +14,7 @@ const MarketplaceItem = sequelize.define('MarketplaceItem', {
   status: { type: DataTypes.ENUM('available', 'sold'), allowNull: false, defaultValue: 'available' },
   user_id: { type: DataTypes.INTEGER, allowNull: false },
 });
+
+MarketplaceItem.belongsTo(User, { foreignKey: 'user_id', as: 'seller' });
 
 export default MarketplaceItem;
