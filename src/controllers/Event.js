@@ -1,4 +1,3 @@
-import { Op } from "sequelize";
 import Event from "../models/Event.js";
 
 export const createEvent = async (req, res) => {
@@ -15,11 +14,6 @@ export const createEvent = async (req, res) => {
 export const getEvents = async (req, res) => {
   try {
     const events = await Event.findAll({
-      where: {
-        date: {
-          [Op.gte]: new Date(), 
-        },
-      },
       order: [['date', 'ASC']],
     });
 
